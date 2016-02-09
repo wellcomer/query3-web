@@ -1,0 +1,633 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="css/main.css" media="screen" type="text/css"/>
+<link type="text/css" href="css/redmond/jquery-ui-1.8.10.custom.css" rel="stylesheet"/>
+<link type="text/css" href="css/auto-complete.css" rel="stylesheet"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<script src="js/jquery-1.5.1.min.js" type="text/javascript"></script>
+<script src="js/jquery.corner.js" type="text/javascript"></script>
+<script src="js/jquery-ui-1.8.10.custom.min.js" type="text/javascript"></script>
+<script src="js/jquery.ui.datepicker-ru.js" type="text/javascript"></script>
+<script src="js/date.format.js" type="text/javascript"></script>
+<script src="js/addclear.min.js" type="text/javascript"></script>
+<script src="js/auto-complete.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+        var search_result;
+        var search_index = -1;
+
+        var engine_url = "query";
+        var autocomplete_url = "autocomplete";
+        var mkods_url = "template";
+
+        $(function() {
+
+            // Autocomplete
+
+            var product = new autoComplete({
+                selector: '#product', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "product", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var company = new autoComplete({
+                selector: '#company', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "company", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var model = new autoComplete({
+                selector: '#model', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "model", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var address = new autoComplete({
+                selector: '#address', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "address", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var srvstat = new autoComplete({
+                selector: '#srvstat', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "srvstat", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var torg = new autoComplete({
+                selector: '#torg', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "torg", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var malfunc = new autoComplete({
+                selector: '#malfunc', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "malfunc", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var comp = new autoComplete({
+                selector: '#comp', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "comp", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var appearance = new autoComplete({
+                selector: '#appearance', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "appearance", term: term }, function(data){ response(data); });
+                }
+            });
+
+            var master = new autoComplete({
+                selector: '#master', minChars: 2,
+                source: function(term, response){
+                    $.getJSON(autocomplete_url, { f: "master", term: term }, function(data){ response(data); });
+                }
+            });
+
+
+//            $("#product").autocomplete ({source: autocomplete_url + "?f=product", autoFocus: true});
+//            $("#company").autocomplete ({source: autocomplete_url + "?f=company"});
+//            $("#model").autocomplete ({source: autocomplete_url + "?f=model"});
+//            $("#address").autocomplete ({source: autocomplete_url + "?f=address"});
+//            $("#srvstat").autocomplete ({source: autocomplete_url + "?f=srvstat"});
+//            $("#torg").autocomplete ({source: autocomplete_url + "?f=torg"});
+//            $("#malfunc").autocomplete ({source: autocomplete_url + "?f=malfunc"});
+//            $("#comp").autocomplete ({source: autocomplete_url + "?f=comp"});
+//            $("#appearance").autocomplete ({source: autocomplete_url + "?f=appearance"});
+//            $("#master").autocomplete ({source: autocomplete_url + "?f=master"});
+
+            $("#product").addClear();
+            $("#company").addClear();
+            $("#model").addClear();
+            $("#address").addClear();
+            $("#srvstat").addClear();
+            $("#torg").addClear();
+            $("#malfunc").addClear();
+            $("#comp").addClear();
+            $("#appearance").addClear();
+            $("#master").addClear();
+
+            function load_query (num){
+
+                if (!num)
+                    return;
+
+                $.getJSON (engine_url, { f: "load_query", n: num }, function (json) {
+
+                    // clear fields from prev request
+
+                    json.product || $("#product").val ('-');
+                    json.company || $("#company").val ('-');
+                    json.model   || $("#model").val ('-');
+                    json.sn      || $("#sn").val ('-');
+                    json.client  || $("#client").val ('-');
+                    json.address || $("#address").val ('-');
+                    json.phone   || $("#phone").val ('-');
+                    json.tdate   || $("#tdate").val ('-');
+                    json.stnum   || $("#stnum").val ('-');
+                    json.srvstat || $("#srvstat").val ('-');
+                    json.torg    || $("#torg").val ('-');
+                    json.malfunc || $("#malfunc").val ('-');
+                    json.comp    || $("#comp").val ('-');
+                    json.comments   || $("#comments").val ('-');
+                    json.appearance || $("#appearance").val ('-');
+                    json.master  || $("#master").val ('-');
+                    json.date    || $("#date").val ('-');
+                    json.ready   || $("#ready").val ('-');
+
+                    // fill form
+
+                    $.each (json, function (key, val) {
+                        val || (key=="ready") || (val = "-");
+                        $ ("#" + key).val (val);
+                        $ ("#" + key).attr ("title", val); // baloon popup for long fields
+                    });
+
+                    $("#kv").attr ("href", mkods_url + "?t=print1&num=" + num);
+
+                    $("#zn").hide ();
+
+                    if ($("#srvtype2").val () == "выездной"){
+                        $("#zn").show ();
+                        if ($("#srvtype").val () == "гарантийный"){
+                            $("#zn").attr ("href", mkods_url + "?t=print2&num=" + num);
+                        }
+                        else {
+                            $("#zn").attr ("href", mkods_url + "?t=print3&num=" + num);
+                        }
+                    }
+
+                    if (is_search_mode ()){
+                        $ ("#sr").show ();
+                    }
+                    else {
+                        $ ("#sr").hide ();
+                        $ ("#info").hide();
+                    }
+                    if ($ ("#ready").val ()){
+                        $ ("#nav_bottom").addClass ("nav_ready");
+                    }
+                    else {
+                        $ ("#nav_bottom").removeClass ("nav_ready");
+                    }
+                })
+                .fail(function (){
+                    $("#product").val ('');
+                    $("#company").val ('');
+                    $("#model").val ('');
+                    $("#sn").val ('');
+                    $("#client").val ('');
+                    $("#address").val ('');
+                    $("#phone").val ('');
+                    $("#tdate").val ('');
+                    $("#stnum").val ('');
+                    $("#srvstat").val ('');
+                    $("#torg").val ('');
+                    $("#malfunc").val ('');
+                    $("#comp").val ('');
+                    $("#comments").val ('');
+                    $("#appearance").val ('');
+                    $("#master").val ('');
+                    $("#date").val ('');
+                    $("#ready").val ('');
+
+                    $ ("#info").show ();
+                    $ ("#info_text").text ("Ошибка чтения заявки");
+                });
+            }
+
+            function is_search_mode (){
+                if (search_index != -1)
+                    return true;
+                return false;
+            }
+
+            $("#sr").click (function (e){ // reset search mode
+                search_result = new Array ();
+                search_index  = -1;
+                $ ("#reqnum").val ('');
+                $ ("#info").hide ();
+                $( "#radio2" ).trigger ($.Event("click"));
+                e.preventDefault();
+            }); 
+
+            // The DOM (document object model) is constructed
+            // We will initialize and run our plugin here
+
+            $( ".date" ).datepicker (); // calendar on date fields
+
+            // Corners
+
+            $( "#nav_top" ).corner ("top");
+            $( "#nav_bottom" ).corner ("bottom");
+            $( "#reqnum" ).corner ();
+
+            $( "#modeset" ).buttonset ();
+            $( "#rmenu_new" ).show ();
+
+            // Main menu
+
+            $( "#radio1" ).click (function () {
+
+                if ($ ("#reqnum").val ()){
+                    $ ("#nav_top_header").text ("ПРАВКА ЗАЯВКИ № " +  $ ("#reqnum").val ());
+                    $ ("#copy_to_new").show ();
+                }
+                
+                $( ".rmenu" ).hide ();
+                $( "#rmenu_new" ).show ();
+                $( "#reqnum" ).hide ();
+
+                if ($( "#reqnum" ).val () == "")
+                    $( "#btn_new" ).trigger ($.Event ("click"));
+
+            });
+            $( "#radio2" ).click (function () {
+                
+                if ( is_search_mode () ){
+                     search_index = search_result.length - 1; // show last found request
+                     $ ("#reqnum").val (search_result [search_index]);
+                     //$ ("#req_count").text (search_result.length);
+                }
+                else {
+                    $ ("#info").hide ();
+                    jQuery.ajaxSetup ({async:false});
+                    $.get(engine_url, { f: "get_query_count" }, function(data) {
+                        $( "#req_count").text (data);
+                    });
+                    jQuery.ajaxSetup ({async:true});
+                }
+
+                $( "#nav_top_header").text ("ПРОСМОТР ЗАЯВКИ №");
+                $( ".rmenu" ).hide ();
+                $( "#rmenu_view" ).show ();
+                $( "#reqnum" ).show ();
+
+                var reqnum_val = parseInt ($ ("#reqnum").val ());
+                var reqcount_val = parseInt ($ ("#req_count").text ());
+
+                if (reqcount_val == 0)
+                    return;
+
+                if (! reqnum_val || reqnum_val > reqcount_val){
+                    reqnum_val = reqcount_val;
+                    $("#reqnum").val (reqnum_val);
+                }
+                load_query (reqnum_val);
+              
+            });
+            $( "#radio3" ).click (function () {
+                $( "#spinner").hide ();
+                $( "#btn_search").show ();
+                $( "#info").hide ();
+                $( "#nav_top_header").text ("ПОИСК ЗАЯВКИ №");
+                $( ".rmenu" ).hide ();
+                $( "#rmenu_search" ).show ();
+                $( "#reqnum" ).show ();
+                $( "input" ).val ("");
+                $( "#nav_bottom").removeClass ("nav_ready");
+            });
+
+            // Srvtype triggers
+
+            $( "#srvtype" ).click(function () {
+                if ($(this).val () == "гарантийный")
+                    $(this).val ("не гарантийный");
+                else
+                    $(this).val ("гарантийный");
+            });
+
+            $( "#srvtype2" ).click(function () {
+                if ($(this).val () == "выездной")
+                    $(this).val ("не выездной");
+                else
+                    $(this).val ("выездной");
+            });
+
+            $ ( "#btn_save" ).click (function () { // Save query
+
+                $ ("#info").hide ();
+
+                if ($ ("#product").val () == "" || $ ("#model").val () == "" || $ ("#client").val () == "" || $ ("#address").val () == ""){
+                    $ ("#info_text").text ("Заполните поля: Изделие, Модель, Заказчик, Адрес");
+                    $ ("#info").show ();
+                    return;
+                }
+
+                var req = "f=save_query&n=" + $("#reqnum").val() + "&" + $ ("input[type=text]").serialize ();
+                //alert (req);
+
+                 var jqxhr = $.post (engine_url, req, function (json){
+                    $ ("#info").show ();
+                    switch (json.status){
+                        case "ERR1":
+                            $ ("#info_text").text ("Ошибка записи в заявку");
+                            break;
+                        case "ERR2":
+                            $ ("#info_text").text ("Невозможно увеличить номер заявки");
+                            break;
+                        case "OK":
+                            $ ("#info_text").text ("Заявка сохранена");
+                            $.get(autocomplete_url + "?update=true");
+                            break;
+                    }                
+                }, "json");
+
+                jqxhr.complete (function (){
+                    $( "#reqnum").val('');
+//                    $( "#radio2" ).trigger ($.Event("click"));
+//                    $( "label[for='radio2']" ).addClass ("ui-state-active");
+//                    $( "label[for='radio1']" ).removeClass ("ui-state-active");
+                });
+            });
+
+            $ ( "#btn_new" ).click (function () { // New query
+
+                $ ("#info").hide ();
+                $ ("#copy_to_new").hide ();
+                $ ("#nav_bottom").removeClass ("nav_ready");
+
+                $ ("input[type=text]").val ('');
+                $ ("input[type=text]").attr ("title", '');
+                $ ("#srvtype").val ("не гарантийный");
+                $ ("#srvtype2").val ("не выездной");
+
+                // Today in date field
+
+                var date = new Date ();
+                today = date.format ("dd.mm.yyyy");
+                $ ("#date").val (today);
+
+                $.get(engine_url, { f: "get_nnum" }, function(data) {
+                    $( "#nav_top_header").text ("НОВАЯ ЗАЯВКА № " + data);
+                    $( "#reqnum").val (data);
+                });
+
+                $.get(engine_url, { f: "get_query_count" }, function(data) {
+                    $( "#req_count").text (data);
+                });
+            });
+
+            $ ("#copy_to_new").click (function (e) {
+
+                e.preventDefault();
+
+                var reqnum = $ ("#reqnum").val ();
+                load_query (reqnum);
+
+                var date = new Date ();
+                today = date.format ("dd.mm.yyyy");
+                $ ("#date").val (today);
+                $ ("#ready").val ('');
+                $ ("#nav_bottom").removeClass ("nav_ready");
+
+                $.get(engine_url, { f: "get_nnum" }, function(data) {
+                    $( "#nav_top_header").text ("НОВАЯ ЗАЯВКА № " + data);
+                    $( "#reqnum").val (data);
+                });
+
+                $.get(engine_url, { f: "get_query_count" }, function(data) {
+                    $( "#req_count").text (data);
+                });
+
+                $ ("#copy_to_new").hide ();
+            });
+
+            $ ( "#btn_cancel" ).click (function () {
+                $( "#radio2" ).trigger ($.Event("click"));
+                $( "label[for='radio2']" ).addClass ("ui-state-active");
+                $( "label[for='radio1']" ).removeClass ("ui-state-active");
+            });
+
+            $ ( "#btn_prev" ).click (function () { // PREV
+                var reqnum = $ ("#reqnum").val ();
+
+                if (is_search_mode ()){
+                    if (search_index < 1)
+                        return;
+                    reqnum = search_result [--search_index];
+                    $ ("#reqnum").val (reqnum);
+                }
+                else {
+                    if (reqnum <= 1)
+                        return;
+                    $ ("#reqnum").val (--reqnum);
+                }
+                load_query (reqnum);
+            });
+
+            $ ( "#btn_next" ).click (function () { // NEXT
+                
+                var reqnum = $ ("#reqnum").val ();
+
+                if (is_search_mode ()){
+                    if (search_index > (search_result.length-2))
+                        return;
+                    reqnum = search_result [++search_index];
+                    $ ("#reqnum").val (reqnum);
+                }
+                else {
+                    if (reqnum >= parseInt ( $("#req_count").text () ))
+                        return;
+                    $ ("#reqnum").val (++reqnum);
+                }
+                load_query (reqnum);
+            });
+
+            $ ( "#btn_edit" ).click (function () {
+                $( "#radio1" ).trigger ($.Event("click"));
+                $( "label[for='radio1']" ).addClass ("ui-state-active");
+                $( "label[for='radio2']" ).removeClass ("ui-state-active");
+            });
+
+            $ ("#reqnum").keydown (function(event) {
+                if (event.keyCode == '13') {
+                    $( "#radio2" ).trigger ($.Event ("click"));
+                    $( "label[for='radio2']" ).addClass ("ui-state-active");
+                    $( "label[for='radio3']" ).removeClass ("ui-state-active");
+                }
+                else if (event.keyCode == '38'){ // up arrow
+                    $ ( "#btn_next" ).trigger ($.Event ("click"));
+                }
+                else if (event.keyCode == '40'){ // down arrow
+                    $ ( "#btn_prev" ).trigger ($.Event ("click"));
+                }
+            });
+
+            $ ( "#btn_search" ).click (function () {
+
+                var req = "f=search&" + $ ("input[type=text]").serialize ();
+                //alert (req);
+
+                $("#btn_search").hide ();
+                $("#spinner").show ();
+
+                $.post (engine_url, req, function (json){
+                    
+                    search_result = new Array ();
+                    search_index  = 0;
+
+                    $.each (json, function (index, value){
+                        if (value)
+                            search_result [index] = value;
+                    });
+
+                    if (search_result.length){
+                        $( "#radio2" ).trigger ($.Event("click"));
+                        $( "label[for='radio2']" ).addClass ("ui-state-active");
+                        $( "label[for='radio3']" ).removeClass ("ui-state-active");
+                    }
+                    else {
+                    // reset_search
+                        search_index = -1;
+                        $ ("#spinner").hide ();
+                        $ ("#btn_search").show ();
+                    }
+
+                    $ ("#info").show ();
+                    $ ("#info_text").text ("Найдено: " + search_result.length);
+
+                }, "json");
+            });
+
+            // Info block at bottom
+
+            $( "#info" ).click (function (){
+                $(this).fadeOut ();
+            });
+
+            // New query mode at init
+
+            $( "#btn_new" ).trigger ($.Event ("click"));
+
+        });
+
+</script>
+
+<title>СЦ Заявка 3.0</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8">
+    <meta http-equiv="content-style-type" content="text/css">
+    <meta http-equiv="expires" content="0">
+</head>
+
+<body>
+
+<div style="margin: auto; width: 660px">
+    <div class="nav" id="nav_top">
+        <table style="width: 100%">
+            <tr>
+                <td id="nav_top_header" nowrap>НОВАЯ ЗАЯВКА № </td>
+                <td><input type="text" id="reqnum" tabindex="1"></td>
+                <td id="nav_top_menu">
+                    <div id="modeset" tabindex="2">
+                        <input type="radio" id="radio1" name="radio" checked="checked" /><label for="radio1">Правка</label>
+                        <input type="radio" id="radio2" name="radio" /><label for="radio2">Просмотр</label>
+                        <input type="radio" id="radio3" name="radio" /><label for="radio3">Поиск</label>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="req">
+    <table>
+       <tr>
+             <td style="width: 18%" class="fname">Изделие</td> <td><input type="text" name="product" class="field" id="product" tabindex="3"></td>
+             <td rowspan="20" align="center" style="width: 60%">
+                <!--<div id="rmenu_new" class="rmenu"> <!-- new request
+                    <button id="btn_save" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-disk"></span> Сохранить </button>
+                    <button id="btn_cancel" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-cancel"></span> Отмена </button>
+                    <button id="btn_new" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-star"></span> Новая </button>
+                </div>-->
+                <div id="rmenu_new" class="rmenu" style="height: 300px"> <!-- edit -->
+                    <table style="height: inherit">
+                        <tr><td style="height: 33%; text-align: left"><br>
+                                <strong><a href="" class="rmenu_links" id="copy_to_new">КОПИРОВАТЬ В НОВУЮ</a></strong>
+                        </td></tr>
+                        <tr><td>
+                            <button id="btn_save" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-disk"></span> Сохранить </button>
+                            <button id="btn_cancel" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-cancel"></span> Отмена </button>
+                            <button id="btn_new" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-star"></span> Новая </button>
+                            </td>
+                        </tr>
+                        <tr><td style="height: 33%"></td></tr>
+                    </table>
+                </div>
+                <div id="rmenu_view" class="rmenu" style="height: 300px"> <!-- view -->
+                    <table style="height: inherit">
+                        <tr><td style="height: 33%; text-align: left">
+                                <strong><a href="" class="rmenu_links" id="sr">СБРОС ПОИСКА</a></strong><br>
+                                <strong><a href="" class="rmenu_links" id="kv">КВИТАНЦИЯ</a></strong><br>
+                                <strong><a href="" class="rmenu_links" id="zn">ЗАКАЗ-НАРЯД</a></strong>
+                        </td></tr>
+                        <tr><td>
+                            <button id="btn_prev" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-arrow-w"></span> Пред. </button>
+                            <button id="btn_next" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-arrow-e"></span> След. </button>
+                            <button id="btn_edit" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-pencil"></span> Правка </button>
+                            </td>
+                        </tr>
+                        <tr><td style="height: 33%"></td></tr>
+                    </table>
+                </div>
+                <div id="rmenu_search" class="rmenu"> <!-- search -->
+                    <button id="btn_search" style="width: 80px" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-search"></span> Поиск </button>
+                    <img id="spinner" src="img/spinner.gif">
+                </div>
+            </td>
+        </tr>
+        <tr> <td class="fname">Фирма</td> <td><input type="text" id="company" name="company" class="field" tabindex="4"></td> </tr>
+        <tr> <td class="fname">Модель</td> <td><input type="text" id="model" name="model" class="field" tabindex="5"></td> </tr>
+        <tr> <td class="fname">Серийный №</td> <td><input type="text" id="sn" name="sn" class="field" tabindex="6"></td> </tr>
+        <tr> <td class="fname">Заказчик</td> <td><input type="text" id="client" name="client" class="field" tabindex="7"></td> </tr>
+        <tr> <td class="fname">Адрес</td> <td><input type="text" id="address" name="address" class="field" tabindex="8"></td>  </tr>
+        <tr> <td class="fname">Телефон</td> <td><input type="text" id="phone" name="phone" class="field" tabindex="9"></td> </tr>
+        <tr> <td class="fname">Дата продажи</td> <td><input type="text" id="tdate" name="tdate" class="date" tabindex="10"></td> </tr>
+        <tr> <td class="fname">№ гар. талона</td> <td><input type="text" id="stnum" name="stnum" class="field" tabindex="11"></td> </tr>
+        <tr> <td class="fname">Тип ремонта</td> <td><input type="text" name="srvtype" id="srvtype" class="field" readonly="readonly" value="гарантийный" tabindex="12"></td> </tr> 
+        <tr> <td></td> <td><input type="text" name="srvtype2" id="srvtype2" class="field" readonly="readonly" value="не выездной" tabindex="13"></td> </tr> 
+
+        <tr> <td class="fname">Статус ремонта</td> <td><input type="text" id="srvstat" name="srvstat" class="field" tabindex="14"></td> </tr>
+        <tr> <td class="fname">Торговая орг.</td> <td><input type="text" id="torg" name="torg" class="field" tabindex="15"></td> </tr>
+        <tr> <td class="fname">Неисправность</td> <td><input type="text" id="malfunc" name="malfunc" class="field" tabindex="16"></td> </tr>
+        <tr> <td class="fname">Комплектность</td> <td><input type="text" id="comp" name="comp" class="field" tabindex="17"></td> </tr>
+        <tr> <td class="fname">Комментарии</td> <td><input type="text" id="comments" name="comments" class="field" tabindex="18"></td> </tr>
+        <tr> <td class="fname">Внешний вид</td> <td><input type="text" id="appearance" name="appearance" class="field" tabindex="19"></td> </tr>
+        <tr> <td class="fname">Мастер</td> <td><input type="text" id="master" name="master" class="field" tabindex="20"></td> </tr>
+        <tr> <td class="fname">Дата приемки</td> <td><input type="text" id="date" name="date" class="date" tabindex="21"></td> </tr>
+        <tr> <td class="fname" id="ready_label">Дата выдачи</td> <td><input type="text" id="ready" name="ready" class="date" tabindex="22"></td> </tr>
+
+    </table>
+
+    <div><input type="hidden" name="mode" id="mode"></div>
+    </div>
+    
+    <div class="nav" id="nav_bottom">
+        <table style="width: 100%">
+            <tr>
+                <td>
+                    <div class="ui-widget" id="info" style="display: none">
+                        <div class="ui-corner-all ui-state-highlight">
+                            <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="info_text"></span></p>
+                        </div>
+                    </div>
+                </td>
+                <td style="float: right; line-height: 20px">Всего заявок: <span id="req_count"></span> &nbsp;</td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

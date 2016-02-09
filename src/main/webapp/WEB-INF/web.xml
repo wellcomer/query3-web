@@ -1,0 +1,77 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Query3 Web Application</display-name>
+  <context-param>
+      <param-name>characterEncoding</param-name>
+      <param-value>default</param-value>
+  </context-param>
+  <context-param>
+      <param-name>dbPath</param-name>
+      <param-value>default</param-value>
+  </context-param>
+  <servlet>
+    <servlet-name>Autocomplete</servlet-name>
+    <servlet-class>ru.wellcomer.query3.servlet.AutocompleteServlet</servlet-class>
+      <init-param>
+          <param-name>disabled</param-name>
+          <param-value>false</param-value>
+      </init-param>
+        <init-param>
+            <param-name>autocompletePath</param-name>
+            <param-value>default</param-value>
+        </init-param>
+        <init-param>
+            <param-name>autoLearn</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>scanModifiedOnly</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>mergePrevious</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>maxItems</param-name>
+            <param-value>3</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>Query</servlet-name>
+    <servlet-class>ru.wellcomer.query3.servlet.QueryServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Template</servlet-name>
+    <servlet-class>ru.wellcomer.query3.servlet.TemplateServlet</servlet-class>
+        <init-param>
+          <param-name>templatePath</param-name>
+          <param-value>default</param-value>
+        </init-param>
+      <init-param>
+          <param-name>saveToPath</param-name>
+          <param-value>default</param-value>
+      </init-param>
+      <init-param>
+          <param-name>redirectURLPrefix</param-name>
+          <param-value>default</param-value>
+      </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Autocomplete</servlet-name>
+    <url-pattern>/autocomplete</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Query</servlet-name>
+    <url-pattern>/query</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Template</servlet-name>
+    <url-pattern>/template</url-pattern>
+  </servlet-mapping>
+
+</web-app>
