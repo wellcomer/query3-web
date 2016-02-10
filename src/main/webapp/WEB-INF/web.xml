@@ -56,10 +56,6 @@
           <param-name>saveToPath</param-name>
           <param-value>default</param-value>
       </init-param>
-      <init-param>
-          <param-name>redirectURLPrefix</param-name>
-          <param-value>default</param-value>
-      </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>Autocomplete</servlet-name>

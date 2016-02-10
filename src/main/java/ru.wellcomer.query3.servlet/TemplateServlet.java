@@ -9,8 +9,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 
@@ -50,11 +53,7 @@ public class TemplateServlet extends HttpServlet {
 
         saveToPath = servletConfig.getInitParameter("saveToPath");
         if (saveToPath.equalsIgnoreCase("default"))
-            saveToPath = Paths.get(servletRealPath, "ods").toString();
-
-        redirectURLPrefix = servletConfig.getInitParameter("redirectURLPrefix");
-        if (redirectURLPrefix.equalsIgnoreCase("default"))
-            redirectURLPrefix = "ods/";
+            saveToPath = System.getProperty("java.io.tmpdir");
 
         template = new Template(templatePath);
         queryList = new QueryList(dbPath, characterEncoding);
@@ -70,9 +69,22 @@ public class TemplateServlet extends HttpServlet {
         LinkedHashMap<String,String> map = queryList.get(queryNumber);
 
         String fileName = template.fillAndSave(map, templateName, saveToPath);
-        String redirectURL = redirectURLPrefix + fileName;
 
-        res.sendRedirect(redirectURL);
+        res.setContentType("application/vnd.oasis.opendocument.spreadsheet");
+        res.setHeader("Content-Disposition", "filename=\"" + fileName + "\"");
+
+        FileInputStream in = new FileInputStream(Paths.get(saveToPath, fileName).toString());
+        OutputStream out = res.getOutputStream();
+
+        byte[] buffer = new byte[4096];
+        int length;
+        while ((length = in.read(buffer)) > 0){
+            out.write(buffer, 0, length);
+        }
+        in.close();
+        out.flush();
+
+        Files.deleteIfExists(Paths.get(saveToPath, fileName));
     }
 }
 
