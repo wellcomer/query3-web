@@ -49,7 +49,7 @@ public class TemplateServlet extends HttpServlet {
 
         templatePath = servletConfig.getInitParameter("templatePath");
         if (templatePath.equalsIgnoreCase("default"))
-            templatePath = Paths.get(servletRealPath, ".template").toString();
+            templatePath = Paths.get(servletRealPath, "template").toString();
 
         saveToPath = servletConfig.getInitParameter("saveToPath");
         if (saveToPath.equalsIgnoreCase("default"))
