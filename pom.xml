@@ -5,15 +5,18 @@
   <artifactId>query3-web</artifactId>
   <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>query3-web Maven Webapp</name>
+  <name>query3-web</name>
   <url>http://maven.apache.org</url>
+  <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <scm>
+      <connection>scm:svn:http://127.0.0.1/dummy</connection>
+      <developerConnection>scm:svn:https://127.0.0.1/dummy</developerConnection>
+      <tag>HEAD</tag>
+      <url>http://127.0.0.1/dummy</url>
+  </scm>
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -40,23 +43,93 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>${project.build.directory}</directory>
+              <includes>
+                <include>**/version</include>
+              </includes>
+            </resource>
+          </webResources>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.1</version>
         <executions>
           <execution>
-            <phase>initialize</phase>
+            <phase>generate-resources</phase>
             <goals>
-              <goal>install-file</goal>
+              <goal>create</goal>
             </goals>
-            <configuration>
-              <groupId>ru.wellcomer.query3</groupId>
-              <artifactId>query3-core</artifactId>
-              <version>1.0</version>
-              <packaging>jar</packaging>
-              <file>${basedir}/lib/query3-core.jar</file>
-            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <revisionOnScmFailure>true</revisionOnScmFailure>
+          <format>{0,number}</format>
+          <items>
+            <item>buildNumber</item>
+          </items>
+        </configuration>
+      </plugin>
+      <!-- Generate build.info -->
+      <plugin>
+        <groupId>com.rodiontsev.maven.plugins</groupId>
+        <artifactId>build-info-maven-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <filename>version</filename>
+          <projectProperties>
+            <projectProperty>project.id</projectProperty>
+            <projectProperty>project.groupId</projectProperty>
+            <projectProperty>project.artifactId</projectProperty>
+            <projectProperty>project.version</projectProperty>
+            <projectProperty>project.name</projectProperty>
+            <projectProperty>project.description</projectProperty>
+            <projectProperty>project.modelVersion</projectProperty>
+            <projectProperty>project.inceptionYear</projectProperty>
+            <projectProperty>project.packaging</projectProperty>
+            <projectProperty>project.url</projectProperty>
+          </projectProperties>
+          <systemProperties>
+            <systemProperty>user.name</systemProperty>
+            <systemProperty>user.timezone</systemProperty>
+            <systemProperty>java.vm.vendor</systemProperty>
+            <systemProperty>java.vm.version</systemProperty>
+            <systemProperty>java.vm.name</systemProperty>
+            <systemProperty>java.runtime.version</systemProperty>
+            <systemProperty>os.name</systemProperty>
+            <systemProperty>os.version</systemProperty>
+            <systemProperty>os.arch</systemProperty>
+          </systemProperties>
+          <environmentVariables>
+            <environmentVariable>JAVA_HOME</environmentVariable>
+          </environmentVariables>
+          <dateTimePattern>yyyy-MM-dd HH:mm:ss</dateTimePattern>
+          <includeVcsInfo>true</includeVcsInfo>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>extract</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
 </project>
