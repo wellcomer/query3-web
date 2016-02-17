@@ -14,7 +14,7 @@
   </context-param>
   <servlet>
     <servlet-name>Autocomplete</servlet-name>
-    <servlet-class>ru.wellcomer.query3.servlet.AutocompleteServlet</servlet-class>
+    <servlet-class>com.github.wellcomer.query3.servlet.AutocompleteServlet</servlet-class>
       <init-param>
           <param-name>disabled</param-name>
           <param-value>false</param-value>
@@ -43,11 +43,11 @@
   </servlet>
   <servlet>
     <servlet-name>Query</servlet-name>
-    <servlet-class>ru.wellcomer.query3.servlet.QueryServlet</servlet-class>
+    <servlet-class>com.github.wellcomer.query3.servlet.QueryServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>Template</servlet-name>
-    <servlet-class>ru.wellcomer.query3.servlet.TemplateServlet</servlet-class>
+    <servlet-class>com.github.wellcomer.query3.servlet.TemplateServlet</servlet-class>
         <init-param>
           <param-name>templatePath</param-name>
           <param-value>default</param-value>
