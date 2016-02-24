@@ -50,7 +50,7 @@
             <resource>
               <directory>${project.build.directory}</directory>
               <includes>
-                <include>**/version</include>
+                <include>version</include>
               </includes>
             </resource>
           </webResources>
