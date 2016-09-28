@@ -1,6 +1,8 @@
 package com.github.wellcomer.query3.servlet;
 
+import com.github.wellcomer.query3.core.Query;
 import com.github.wellcomer.query3.core.QueryList;
+import com.github.wellcomer.query3.core.QueryStorage;
 import com.github.wellcomer.query3.core.Template;
 
 import javax.servlet.ServletConfig;
@@ -29,9 +31,9 @@ import java.util.LinkedHashMap;
 //@WebServlet("/template")
 public class TemplateServlet extends HttpServlet {
 
-    private String dbPath, templatePath, saveToPath, characterEncoding, redirectURLPrefix;
     private Template template;
     private QueryList queryList;
+    private String saveToPath;
 
     @Override
     public void init(ServletConfig servletConfig) {
@@ -39,15 +41,21 @@ public class TemplateServlet extends HttpServlet {
         ServletContext servletContext = servletConfig.getServletContext();
         String servletRealPath = servletContext.getRealPath("/");
 
-        dbPath = servletContext.getInitParameter("dbPath");
+        String dbPath = servletContext.getInitParameter("dbPath");
         if (dbPath.equalsIgnoreCase("default"))
             dbPath = Paths.get(servletRealPath, ".db").toString();
 
-        characterEncoding = servletContext.getInitParameter("characterEncoding");
+        String dbName = servletContext.getInitParameter("dbName");
+
+        String stgBackendName = servletContext.getInitParameter("stgBackendName");
+        if (stgBackendName.equalsIgnoreCase("default"))
+            stgBackendName = "mapdb";
+
+        String characterEncoding = servletContext.getInitParameter("characterEncoding");
         if (characterEncoding.equalsIgnoreCase("default"))
             characterEncoding = Charset.defaultCharset().toString();
 
-        templatePath = servletConfig.getInitParameter("templatePath");
+        String templatePath = servletConfig.getInitParameter("templatePath");
         if (templatePath.equalsIgnoreCase("default"))
             templatePath = Paths.get(servletRealPath, "template").toString();
 
@@ -56,7 +64,7 @@ public class TemplateServlet extends HttpServlet {
             saveToPath = System.getProperty("java.io.tmpdir");
 
         template = new Template(templatePath);
-        queryList = new QueryList(dbPath, characterEncoding);
+        queryList = QueryListSingle.getInstance(stgBackendName, dbPath, dbName, characterEncoding);
     }
 
     @Override
@@ -66,9 +74,16 @@ public class TemplateServlet extends HttpServlet {
         Integer queryNumber = Integer.decode(req.getParameter("num"));
         String templateName = req.getParameter("t");
 
-        LinkedHashMap<String,String> map = queryList.get(queryNumber);
+        Query query;
 
-        String fileName = template.fillAndSave(map, templateName, saveToPath);
+        try {
+            query = queryList.getStorageBackend().get(queryNumber);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        String fileName = template.fillAndSave(query, templateName, saveToPath);
 
         res.setContentType("application/vnd.oasis.opendocument.spreadsheet");
         res.setHeader("Content-Disposition", "filename=\"" + fileName + "\"");

@@ -3,6 +3,7 @@ package com.github.wellcomer.query3.servlet;
 import com.github.wellcomer.query3.core.Autocomplete;
 import com.github.wellcomer.query3.core.Json;
 import com.github.wellcomer.query3.core.QueryList;
+import com.github.wellcomer.query3.core.QueryStorage;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -30,10 +31,9 @@ import java.util.List;
 public class AutocompleteServlet extends HttpServlet {
 
     private Autocomplete autocomp;
-    private String dbPath, characterEncoding, autocompletePath;
-    private boolean autoLearn, scanModifiedOnly, mergePrevious, disabled;
+    private String characterEncoding;
+    private boolean autoLearn, disabled;
     private QueryList queryList;
-    int maxItems;
 
     @Override
     public void init(ServletConfig servletConfig) {
@@ -46,21 +46,29 @@ public class AutocompleteServlet extends HttpServlet {
         ServletContext servletContext = servletConfig.getServletContext();
         String servletRealPath = servletContext.getRealPath("/");
 
-        dbPath = servletContext.getInitParameter("dbPath");
+        String dbPath = servletContext.getInitParameter("dbPath");
         if (dbPath.equalsIgnoreCase("default"))
             dbPath = Paths.get(servletRealPath, ".db").toString();
+
+        String dbName = servletContext.getInitParameter("dbName");
+
+        String stgBackendName = servletContext.getInitParameter("stgBackendName");
+        if (stgBackendName.equalsIgnoreCase("default"))
+            stgBackendName = "mapdb";
 
         characterEncoding = servletContext.getInitParameter("characterEncoding");
         if (characterEncoding.equalsIgnoreCase("default"))
             characterEncoding = Charset.defaultCharset().toString();
 
-        autocompletePath = servletConfig.getInitParameter("autocompletePath");
+        String autocompletePath = servletConfig.getInitParameter("autocompletePath");
         if (autocompletePath.equalsIgnoreCase("default"))
             autocompletePath = Paths.get(servletRealPath, ".autocomplete").toString();
 
         autoLearn = Boolean.parseBoolean(servletConfig.getInitParameter("autoLearn"));
-        scanModifiedOnly = Boolean.parseBoolean(servletConfig.getInitParameter("scanModifiedOnly"));
-        mergePrevious = Boolean.parseBoolean(servletConfig.getInitParameter("mergePrevious"));
+        boolean scanModifiedOnly = Boolean.parseBoolean(servletConfig.getInitParameter("scanModifiedOnly"));
+        boolean mergePrevious = Boolean.parseBoolean(servletConfig.getInitParameter("mergePrevious"));
+
+        int maxItems;
 
         try {
             maxItems = Integer.parseInt(servletConfig.getInitParameter("maxItems"));
@@ -72,7 +80,7 @@ public class AutocompleteServlet extends HttpServlet {
         autocomp = new Autocomplete(autocompletePath, characterEncoding, maxItems);
 
         if (autoLearn) {
-            queryList = new QueryList(dbPath, characterEncoding);
+            queryList = QueryListSingle.getInstance(stgBackendName, dbPath, dbName, characterEncoding);
             try {
                 autocomp.autolearn(queryList, scanModifiedOnly, mergePrevious);
             } catch (IOException e) {

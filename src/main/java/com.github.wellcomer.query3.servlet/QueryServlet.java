@@ -1,22 +1,21 @@
 package com.github.wellcomer.query3.servlet;
 
+import com.github.wellcomer.query3.core.Json;
+import com.github.wellcomer.query3.core.Query;
+import com.github.wellcomer.query3.core.QueryList;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
-
-import com.github.wellcomer.query3.core.Json;
-import com.github.wellcomer.query3.core.Query;
-import com.github.wellcomer.query3.core.QueryList;
 
 /**
  * Created on 10.11.15.
@@ -31,7 +30,6 @@ import com.github.wellcomer.query3.core.QueryList;
 //@WebServlet("/query")
 public class QueryServlet extends HttpServlet {
 
-    private String dbPath, characterEncoding;
     private QueryList queryList;
 
     @Override
@@ -40,15 +38,21 @@ public class QueryServlet extends HttpServlet {
         ServletContext servletContext = servletConfig.getServletContext();
         String servletRealPath = servletContext.getRealPath("/");
 
-        dbPath = servletContext.getInitParameter("dbPath");
+        String dbPath = servletContext.getInitParameter("dbPath");
         if (dbPath.equalsIgnoreCase("default"))
             dbPath = Paths.get(servletRealPath, ".db").toString();
 
-        characterEncoding = servletContext.getInitParameter("characterEncoding");
+        String dbName = servletContext.getInitParameter("dbName");
+
+        String stgBackendName = servletContext.getInitParameter("stgBackendName");
+        if (stgBackendName.equalsIgnoreCase("default"))
+            stgBackendName = "mapdb";
+
+        String characterEncoding = servletContext.getInitParameter("characterEncoding");
         if (characterEncoding.equalsIgnoreCase("default"))
             characterEncoding = Charset.defaultCharset().toString();
 
-        queryList = new QueryList(dbPath, characterEncoding);
+        queryList = QueryListSingle.getInstance(stgBackendName, dbPath, dbName, characterEncoding);
     }
 
     @Override
@@ -69,15 +73,19 @@ public class QueryServlet extends HttpServlet {
         switch (funcName){
             case "get_nnum":
                 try {
-                    out.print(queryList.getNewNumber().toString());
+                    out.print(queryList.getStorageBackend().getNewNumber().toString());
                 }
-                catch (IOException e){
+                catch (Exception e){
                     out.print("1");
                 }
                 break;
             case "load_query":
                 Integer queryNumber = Integer.decode(req.getParameter("n"));
-                out.print(Json.toString(queryList.get(queryNumber)));
+                try {
+                    out.print(Json.toString(queryList.getStorageBackend().get(queryNumber)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case "save_query":
                 HashMap<String, String> saveResult = new HashMap<>();
@@ -92,7 +100,7 @@ public class QueryServlet extends HttpServlet {
                         query.put(paramName, req.getParameter(paramName));
                     }
 
-                    queryList.add(queryNumber, query);
+                    queryList.getStorageBackend().add(queryNumber, query);
                     saveResult.put("status", "OK");
                 }
                 catch (Exception e){
@@ -102,7 +110,7 @@ public class QueryServlet extends HttpServlet {
                 out.print(Json.toString(saveResult));
                 break;
             case "get_query_count":
-                out.print(queryList.size().toString());
+                out.print(queryList.getStorageBackend().size().toString());
                 break;
             case "search":
                 Query query = new Query();

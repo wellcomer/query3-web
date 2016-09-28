@@ -12,6 +12,14 @@
       <param-name>dbPath</param-name>
       <param-value>default</param-value>
   </context-param>
+  <context-param>
+      <param-name>dbName</param-name>
+      <param-value>default</param-value>
+  </context-param>
+  <context-param>
+      <param-name>stgBackendName</param-name>
+      <param-value>default</param-value>
+  </context-param>
   <servlet>
     <servlet-name>Autocomplete</servlet-name>
     <servlet-class>com.github.wellcomer.query3.servlet.AutocompleteServlet</servlet-class>
