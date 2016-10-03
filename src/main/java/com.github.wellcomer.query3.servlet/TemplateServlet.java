@@ -2,7 +2,6 @@ package com.github.wellcomer.query3.servlet;
 
 import com.github.wellcomer.query3.core.Query;
 import com.github.wellcomer.query3.core.QueryList;
-import com.github.wellcomer.query3.core.QueryStorage;
 import com.github.wellcomer.query3.core.Template;
 
 import javax.servlet.ServletConfig;
@@ -17,7 +16,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
 
 /**
  * Created on 12.11.15.

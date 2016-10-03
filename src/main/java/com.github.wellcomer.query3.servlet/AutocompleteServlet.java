@@ -3,7 +3,6 @@ package com.github.wellcomer.query3.servlet;
 import com.github.wellcomer.query3.core.Autocomplete;
 import com.github.wellcomer.query3.core.Json;
 import com.github.wellcomer.query3.core.QueryList;
-import com.github.wellcomer.query3.core.QueryStorage;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
